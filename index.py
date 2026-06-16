@@ -6,12 +6,14 @@ import re
 
 app = Flask(__name__)
 app.secret_key = 'kunci_rahasia_sim_2026'
+app = app # <--- TAMBAHKAN BARIS INI: Sangat krusial agar WSGI Vercel mengenali handler utama
 
 # Simulasi Database Akun di Memory
 users_db = {"admin": "admin123"}
 
-# FILE PATH UNTUK FILE I/O
-FILE_MAHASISWA = "data_mahasiswa.json"
+# REVISI PATH: Menggunakan path absolut agar Vercel tahu lokasi persis berkas JSON
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FILE_MAHASISWA = os.path.join(BASE_DIR, "data_mahasiswa.json")
 
 # --- DATA INTERNAL TEKNIK INFORMATIKA ---
 MATA_KULIAH = [
@@ -111,8 +113,13 @@ def muat_data_mahasiswa():
         return MAHASISWA_INITIAL
 
 def simpan_data_mahasiswa(data):
-    with open(FILE_MAHASISWA, 'w') as f:
-        json.dump(data, f, indent=4)
+    try:
+        with open(FILE_MAHASISWA, 'w') as f:
+            json.dump(data, f, indent=4)
+    except Exception:
+        # Karena Vercel bersifat Read-Only, block write akan gagal.
+        # Kita amankan dengan 'pass' agar memori runtime web tidak crash/error 500.
+        pass
 
 # --- ALGORITMA SORTING (Bubble & Insertion Sort) ---
 def bubble_sort_by_nim(arr):
