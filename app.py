@@ -12,7 +12,7 @@ users_db = {"admin": "admin123"}
 
 # FILE PATH UNTUK FILE I/O
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FILE_MAHASISWA = "data_mahasiswa.json"
+FILE_MAHASISWA = os.path.join(BASE_DIR, "data_mahasiswa.json")
 
 # --- DATA INTERNAL TEKNIK INFORMATIKA ---
 MATA_KULIAH = [
