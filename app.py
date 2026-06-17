@@ -5,7 +5,7 @@ import os
 import re
 
 app = Flask(__name__)
-app.secret_key = 'kunci_rahasia_sim_2026'
+app.secret_key = os.environ.get('SECRET_KEY', 'kunci_rahasia_sim_2026')
 
 # Simulasi Database Akun di Memory
 users_db = {"admin": "admin123"}
@@ -280,4 +280,6 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
