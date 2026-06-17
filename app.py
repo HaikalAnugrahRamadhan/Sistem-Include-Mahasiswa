@@ -11,6 +11,7 @@ app.secret_key = 'kunci_rahasia_sim_2026'
 users_db = {"admin": "admin123"}
 
 # FILE PATH UNTUK FILE I/O
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FILE_MAHASISWA = "data_mahasiswa.json"
 
 # --- DATA INTERNAL TEKNIK INFORMATIKA ---
