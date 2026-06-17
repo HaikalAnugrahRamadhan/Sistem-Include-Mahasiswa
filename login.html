@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIM - {% if form_type == 'login' %}Masuk{% else %}Daftar Akun{% endif %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-blue-50 h-screen flex items-center justify-center font-sans">
+
+    <div class="bg-white rounded-2xl shadow-lg border border-blue-100 max-w-sm w-full p-8 mx-4 text-center">
+        
+        <div class="mb-6">
+            <img src="https://img.icons8.com/color/48/graduation-cap.png" alt="Logo" class="mx-auto w-16 h-16">
+            <h1 class="text-lg font-bold text-slate-800 mt-3">Sistem Include Mahasiswa</h1>
+            <p class="text-blue-600 font-semibold text-sm mt-1">
+                {% if form_type == 'login' %}Welcome to SIM{% else %}Registrasi Akun Baru{% endif %}
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category != 'welcome' %}
+              <div class="p-2.5 mb-4 text-xs rounded-xl font-medium border {% if category == 'success' %} bg-emerald-50 text-emerald-800 border-emerald-200 {% else %} bg-rose-50 text-rose-800 border-rose-200 {% endif %}">
+                 {{ message }}
+              </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if form_type == 'login' %}
+        <form action="/" method="POST" class="space-y-4 text-left">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Username</label>
+                <input type="text" name="username" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="Masukkan username">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Password</label>
+                <div class="relative">
+                    <input type="password" id="login-pass" name="password" required class="w-full mt-1 pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="Masukkan password">
+                    <button type="button" onclick="togglePassword('login-pass', 'eye-icon-login')" class="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer">
+                        <i id="eye-icon-login" class="fa-solid fa-eye text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm transition cursor-pointer">Log In</button>
+                <a href="/registrasi" class="w-full py-2.5 bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold rounded-xl text-center text-xs uppercase tracking-wider transition">Register</a>
+            </div>
+        </form>
+
+        {% else %}
+        <form action="/registrasi" method="POST" class="space-y-4 text-left">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Username Baru</label>
+                <input type="text" name="username" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="Buat username baru">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Password</label>
+                <div class="relative">
+                    <input type="password" id="reg-pass" name="password" required class="w-full mt-1 pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="Buat password">
+                    <button type="button" onclick="togglePassword('reg-pass', 'eye-icon-reg')" class="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer">
+                        <i id="eye-icon-reg" class="fa-solid fa-eye text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Masukkan Ulang Password</label>
+                <div class="relative">
+                    <input type="password" id="reg-pass-confirm" name="confirm_password" required class="w-full mt-1 pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="Ketik ulang password anda">
+                    <button type="button" onclick="togglePassword('reg-pass-confirm', 'eye-icon-reg-confirm')" class="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer">
+                        <i id="eye-icon-reg-confirm" class="fa-solid fa-eye text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-3 pt-2">
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm transition cursor-pointer">Daftar Sekarang</button>
+                
+                <p class="text-center text-xs text-slate-500 font-semibold mt-1">
+                    Sudah punya akun? <a href="/" class="text-blue-600 hover:underline transition">Log In di sini</a>
+                </p>
+            </div>
+        </form>
+        {% endif %}
+
+    </div>
+
+    <script>
+        function togglePassword(inputId, iconId) {
+            const passInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            } else {
+                passInput.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            }
+        }
+    </script>
+</body>
+</html>

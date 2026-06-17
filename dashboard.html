@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIM - {{ page.capitalize() }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 flex h-screen overflow-hidden font-sans relative">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'welcome' %}
+          <div id="welcome-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-blue-600 text-white px-6 py-3.5 rounded-2xl shadow-xl border border-blue-500 font-bold text-xs uppercase tracking-wider flex items-center gap-3 transition-all duration-500 opacity-100 transform translate-y-0">
+              <i class="fa-solid fa-circle-check text-base animate-bounce"></i>
+              <span>Selamat datang di Sistem Include Mahasiswa</span>
+          </div>
+          {% elif category == 'success' or category == 'error' %}
+          <div class="fixed top-6 right-6 z-50 p-4 rounded-xl text-xs font-bold border flex items-center gap-2 {% if category == 'success' %} bg-emerald-50 text-emerald-800 border-emerald-200 {% else %} bg-rose-50 text-rose-800 border-rose-200 {% endif %} shadow-md">
+                <i class="fa-solid {% if category == 'success' %} fa-circle-check {% else %} fa-circle-exclamation {% endif %}"></i>
+                {{ message }}
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div id="announcement-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden transform scale-95 transition-all">
+            <div class="bg-slate-50 p-4 border-b border-slate-100 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn text-emerald-600 text-sm"></i>
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Seluruh Pengumuman Kampus</h3>
+                </div>
+                <button onclick="closeAnnouncementModal()" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-200/60 hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition cursor-pointer font-bold text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3.5 max-h-[380px] overflow-y-auto">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">12 Jun 2026</span></div>
+                    <p class="font-bold text-slate-800 text-xs">Seminar Kesiapan Kerja & AI</p>
+                    <p class="text-slate-500 text-[11px] mt-0.5">Wajib bagi semester 6 & 8 di Gedung A Lt.3.</p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">15 Jun 2026</span></div>
+                    <p class="font-bold text-slate-800 text-xs">Pengisian Kuesioner Evaluasi Dosen</p>
+                    <p class="text-slate-500 text-[11px] mt-0.5">Isi kuesioner di portal SIM sebagai syarat cetak KST UTS.</p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md">18 Jun 2026</span></div>
+                    <p class="font-bold text-slate-800 text-xs">Batas Akhir Input Nilai UTS/UAS Dosen</p>
+                    <p class="text-slate-500 text-[11px] mt-0.5">Mohon bapak/ibu dosen menyelesaikan penilaian tepat waktu.</p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md">22 Jun 2026</span></div>
+                    <p class="font-bold text-slate-800 text-xs">Pendaftaran Beasiswa Unggulan Internal</p>
+                    <p class="text-slate-500 text-[11px] mt-0.5">Syarat minimal IPK berjalan 3.50. Ajukan berkas ke BAK.</p>
+                </div>
+            </div>
+            <div class="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                <button onclick="closeAnnouncementModal()" class="px-4 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-bold cursor-pointer hover:bg-slate-700 transition">Selesai Membaca</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-64 bg-slate-900 text-white flex flex-col justify-between p-6 shadow-xl shrink-0">
+        <div>
+          <div class="text-center border-b border-slate-800 pb-5 mb-6">
+            <img src="https://img.icons8.com/color/48/graduation-cap.png" alt="Logo" class="mx-auto w-10 h-10 mb-1">
+            <span class="block text-xs uppercase font-black tracking-widest text-blue-400">SIM</span>
+          </div>
+
+          <nav class="space-y-1">
+            <span class="block text-slate-500 text-[10px] font-bold uppercase tracking-wider px-3 mb-2">Menu Navigasi</span>
+            <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition {% if page == 'dashboard' %} bg-blue-600 text-white font-bold {% else %} text-slate-400 hover:bg-slate-800 hover:text-white {% endif %}">
+              <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+            </a>
+            <a href="/mahasiswa" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition {% if page == 'mahasiswa' %} bg-blue-600 text-white font-bold {% else %} text-slate-400 hover:bg-slate-800 hover:text-white {% endif %}">
+              <i class="fa-solid fa-user-graduate w-5"></i> Data Mahasiswa
+            </a>
+            <a href="/dosen" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition {% if page == 'dosen' %} bg-blue-600 text-white font-bold {% else %} text-slate-400 hover:bg-slate-800 hover:text-white {% endif %}">
+              <i class="fa-solid fa-chalkboard-user w-5"></i> Data Dosen
+            </a>
+            <a href="/matkul" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition {% if page == 'matkul' %} bg-blue-600 text-white font-bold {% else %} text-slate-400 hover:bg-slate-800 hover:text-white {% endif %}">
+              <i class="fa-solid fa-book w-5"></i> Mata Kuliah
+            </a>
+          </nav>
+        </div>
+
+        <div class="border-t border-slate-800 pt-4">
+          <p class="text-xs text-slate-400 mb-2 px-1">User: <strong class="text-white">{{ session['user'] }}</strong></p>
+          <a href="/logout" class="w-full flex items-center justify-center gap-2 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition">
+            <i class="fa-solid fa-right-from-bracket"></i> Keluar
+          </a>
+        </div>
+    </div>
+
+    <div class="flex-1 flex flex-col overflow-y-auto">
+        <header class="bg-white border-b border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-10">
+          <div>
+            <h1 class="text-xl font-bold text-slate-800">
+                {% if page == 'dashboard' %} Dashboard Academic
+                {% elif page == 'mahasiswa' %} Manajemen Data Mahasiswa
+                {% elif page == 'dosen' %} Manajemen Data Dosen
+                {% else %} Informasi Mata Kuliah
+                {% endif %}
+            </h1>
+            <p class="text-xs text-slate-500">Sistem Include Mahasiswa</p>
+          </div>
+
+          {% if page != 'dashboard' %}
+          <form action="/{{ page }}" method="GET" class="relative max-w-sm w-full">
+          <input type="text" name="search" id="live-search-input" value="{{ search_query if search_query else '' }}" placeholder="Ketik untuk mencari otomatis..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+          </form>
+          {% endif %}
+        </header>
+
+        <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
+          
+          {% if page == 'dashboard' %}
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-1">
+            <div class="bg-blue-50/60 p-6 rounded-2xl border border-blue-100 shadow-2xs flex items-center justify-between border-l-4 border-l-blue-600">
+                <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mahasiswa Aktif</p><p class="text-3xl font-black text-slate-800 mt-1">{{ mhs_count }}</p></div>
+                <div class="p-3.5 bg-blue-100/80 text-blue-600 rounded-xl"><i class="fa-solid fa-users text-xl"></i></div>
+            </div>
+            <div class="bg-cyan-50/60 p-6 rounded-2xl border border-cyan-100 shadow-2xs flex items-center justify-between border-l-4 border-l-cyan-500">
+                <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dosen Aktif</p><p class="text-3xl font-black text-slate-800 mt-1">{{ dsn_count }}</p></div>
+                <div class="p-3.5 bg-cyan-100/80 text-cyan-600 rounded-xl"><i class="fa-solid fa-user-tie text-xl"></i></div>
+            </div>
+            <div class="bg-emerald-50/60 p-6 rounded-2xl border border-emerald-100 shadow-2xs flex items-center justify-between border-l-4 border-l-emerald-500">
+                <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mata Kuliah</p><p class="text-3xl font-black text-slate-800 mt-1">{{ mk_count }}</p></div>
+                <div class="p-3.5 bg-emerald-100/80 text-emerald-600 rounded-xl"><i class="fa-solid fa-book-open text-xl"></i></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              
+              <div class="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 shadow-2xs flex flex-col justify-between">
+                  <div>
+                      <div class="flex justify-between items-center mb-4">
+                          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-calendar-days text-blue-600 mr-2"></i> Kalender Academic</h3>
+                          <div class="flex items-center gap-2 bg-white/80 p-1 rounded-xl border border-indigo-100">
+                              <button onclick="changeMonth(-1)" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-lg shadow-2xs text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
+                              <span id="calendar-month-year" class="text-[11px] font-bold text-slate-700 min-w-[75px] text-center">Juni 2026</span>
+                              <button onclick="changeMonth(1)" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-lg shadow-2xs text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
+                          </div>
+                      </div>
+                      
+                      <div class="grid grid-cols-7 gap-1 text-center text-[11px] mb-2">
+                          <div class="font-bold text-rose-500 py-1">Min</div><div class="font-bold text-slate-400 py-1">Sen</div><div class="font-bold text-slate-400 py-1">Sel</div><div class="font-bold text-slate-400 py-1">Rab</div><div class="font-bold text-slate-400 py-1">Kam</div><div class="font-bold text-slate-400 py-1">Jum</div><div class="font-bold text-slate-400 py-1">Sab</div>
+                      </div>
+                      <div id="calendar-days-container" class="grid grid-cols-7 gap-1 text-center text-[11px]"></div>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-4 pt-2 border-t border-indigo-100 flex items-center justify-between">
+                      <span><i class="fa-solid fa-circle text-[7px] text-blue-600 mr-1"></i> Tanggal bisa diklik ganti status</span>
+                      <span id="selected-date-indicator" class="font-bold text-blue-600 bg-white px-2 py-0.5 rounded-md border border-indigo-100">Hari ini: 10 Juni</span>
+                  </div>
+              </div>
+
+              <div class="bg-violet-50/50 p-6 rounded-2xl border border-violet-100 shadow-2xs flex flex-col justify-between">
+                  <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4"><i class="fa-solid fa-chart-line text-cyan-500 mr-2"></i> Grafik Kelulusan Mahasiswa IT</h3>
+                  <div class="flex items-end justify-between h-32 pt-4 px-2 border-b border-l border-violet-200/70">
+                      <div id="bar-2023" class="w-8 bg-blue-500 rounded-t-md relative group transition-all duration-500" style="height: 40%;">
+                          <span id="label-2023" class="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">40%</span>
+                      </div>
+                      <div id="bar-2024" class="w-8 bg-cyan-500 rounded-t-md relative group transition-all duration-500" style="height: 60%;">
+                          <span id="label-2024" class="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">60%</span>
+                      </div>
+                      <div id="bar-2025" class="w-8 bg-indigo-500 rounded-t-md relative group transition-all duration-500" style="height: 80%;">
+                          <span id="label-2025" class="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">80%</span>
+                      </div>
+                      <div id="bar-2026" class="w-8 bg-blue-600 rounded-t-md relative group transition-all duration-500" style="height: 95%;">
+                          <span id="label-2026" class="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition">95%</span>
+                      </div>
+                  </div>
+                  <div class="flex justify-between mt-2 text-[10px] font-bold text-slate-400 px-1">
+                      <span>2023</span><span>2024</span><span>2025</span><span id="active-graph-year" class="text-blue-600 font-black">2026</span>
+                  </div>
+              </div>
+
+              <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-100 shadow-2xs flex flex-col justify-between">
+                  <div>
+                      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4"><i class="fa-solid fa-bullhorn text-emerald-500 mr-2"></i> Berita & Informasi Kampus</h3>
+                      <div class="space-y-3">
+                          <div class="flex items-start gap-3 p-2.5 bg-white/80 rounded-xl border border-teal-100">
+                              <div class="bg-emerald-100 text-emerald-700 p-2 rounded-lg text-xs font-bold shrink-0">12/06</div>
+                              <div class="text-[11px]"><p class="font-bold text-slate-700 leading-tight">Seminar Kesiapan Kerja & AI</p><p class="text-slate-500 mt-0.5">Tempat: Gedung A Lt. 3</p></div>
+                          </div>
+                          <div class="flex items-start gap-3 p-2.5 bg-white/80 rounded-xl border border-teal-100">
+                              <div class="bg-blue-100 text-blue-700 p-2 rounded-lg text-xs font-bold shrink-0">15/06</div>
+                              <div class="text-[11px]"><p class="font-bold text-slate-700 leading-tight">Pengisian Kuesioner Dosen</p><p class="text-slate-500 mt-0.5">Wajib sebagai syarat cetak KST</p></div>
+                          </div>
+                      </div>
+                  </div>
+                  <button type="button" onclick="openAnnouncementModal()" class="mt-4 pt-2 text-[11px] font-bold text-teal-700 text-center hover:underline cursor-pointer block w-full">
+                      Lihat Semua Pengumuman <i class="fa-solid fa-arrow-right ml-1"></i>
+                  </button>
+              </div>
+
+              <div class="bg-amber-50/40 p-6 rounded-2xl border border-amber-100 shadow-2xs flex flex-col justify-between">
+                  <div>
+                      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i> Mahasiswa IPK Tertinggi</h3>
+                      <div class="space-y-3">
+                          <div class="flex items-center justify-between p-2 bg-white/90 rounded-xl border border-amber-100/70">
+                              <div class="flex items-center gap-3">
+                                  <div class="w-7 h-7 bg-amber-500 text-white font-black text-xs rounded-full flex items-center justify-center shadow-2xs">H</div>
+                                  <div>
+                                      <p class="text-xs font-bold text-slate-800">Haikal Anugrah Ramadhan</p>
+                                      <p class="text-[10px] text-slate-400">NIM: 241011450240</p>
+                                  </div>
+                              </div>
+                              <span class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200"><i class="fa-solid fa-star text-[10px] mr-1"></i>4.00</span>
+                          </div>
+                          <div class="flex items-center justify-between p-2 bg-white/90 rounded-xl border border-amber-100/70">
+                              <div class="flex items-center gap-3">
+                                  <div class="w-7 h-7 bg-slate-700 text-white font-black text-xs rounded-full flex items-center justify-center">B</div>
+                                  <div>
+                                      <p class="text-xs font-bold text-slate-800">Yuna Aveline</p>
+                                      <p class="text-[10px] text-slate-400">NIM: 241011452241</p>
+                                  </div>
+                              </div>
+                              <span class="text-xs font-black text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg">3.94</span>
+                          </div>
+                          <div class="flex items-center justify-between p-2 bg-white/90 rounded-xl border border-amber-100/70">
+                              <div class="flex items-center gap-3">
+                                  <div class="w-7 h-7 bg-slate-600 text-white font-black text-xs rounded-full flex items-center justify-center">K</div>
+                                  <div>
+                                      <p class="text-xs font-bold text-slate-800">Elina Grace</p>
+                                      <p class="text-[10px] text-slate-400">NIM: 241011451248</p>
+                                  </div>
+                              </div>
+                              <span class="text-xs font-black text-slate-600 bg-slate-100 px-2 py-0.5 rounded-lg">3.88</span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="mt-3 pt-2 border-t border-amber-100/60 text-right">
+                      <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Data otomatis diperbarui per semester</p>
+                  </div>
+              </div>
+
+          </div>
+
+          {% elif page == 'mahasiswa' %}
+          <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs font-semibold text-blue-800 flex items-center justify-between shadow-3xs">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-stopwatch text-sm"></i>
+                <span>Waktu Pencarian: <strong id="realtime-waktu" class="bg-blue-200 px-1.5 py-0.5 rounded text-blue-950">0 detik</strong></span>
+            </div>
+        <div class="flex items-center gap-2">
+                <i class="fa-solid fa-circle-nodes text-sm"></i>
+                <span id="realtime-kompleksitas">Sequential Search Complexity: O(n)</span>
+        </div>
+    </div>
+
+          <div class="flex justify-end">
+              <button onclick="openModalTambah()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition cursor-pointer">
+                  <i class="fa-solid fa-plus mr-1"></i> Tambah Mahasiswa
+              </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <table class="w-full text-left text-sm" id="data-table-target">
+                <thead class="bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider">
+                  <tr><th class="px-6 py-3">No</th><th class="px-6 py-3">NIM</th><th class="px-6 py-3">Nama Lengkap</th><th class="px-6 py-3">Program Studi</th><th class="px-6 py-3 text-center">Aksi Berkas</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700">
+                  {% for m in data_list %}
+                  <tr class="hover:bg-slate-50 transition table-row-item">
+                    <td class="px-6 py-3 text-slate-400">{{ loop.index }}</td>
+                    <td class="px-6 py-3 font-mono font-bold text-blue-600">{{ m.nim }}</td>
+                    <td class="px-6 py-3 font-medium text-slate-900 data-search-field">{{ m.nama }}</td>
+                    <td class="px-6 py-3"><span class="px-2 py-0.5 bg-slate-100 rounded text-xs">{{ m.prodi }}</span></td>
+                    <td class="px-6 py-3 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="openModalEdit('{{ m.nim }}', '{{ m.nama }}', '{{ m.prodi }}')" class="text-amber-600 hover:text-amber-800 transition cursor-pointer" title="Ubah Data"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                            <button onclick="triggerKonfirmasiHapus('{{ m.nim }}')" class="text-rose-600 hover:text-rose-800 transition cursor-pointer" title="Hapus Data"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  <tr id="no-data-row" class="hidden"><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-xs">Data tidak ditemukan.</td></tr>
+                </tbody>
+            </table>
+          </div>
+
+          {% elif page == 'dosen' %}
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <table class="w-full text-left text-sm" id="data-table-target">
+                <thead class="bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider">
+                  <tr><th class="px-6 py-3">No</th><th class="px-6 py-3">Nama Lengkap</th><th class="px-6 py-3">Lulusan Bidang</th><th class="px-6 py-3">Mata Kuliah Diajar</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700">
+                  {% for d in data_list %}
+                  <tr class="hover:bg-slate-50 transition table-row-item">
+                    <td class="px-6 py-3 text-slate-400">{{ loop.index }}</td>
+                    <td class="px-6 py-3 font-semibold text-slate-900 data-search-field">{{ d.nama }}</td>
+                    <td class="px-6 py-3 text-slate-500">{{ d.lulusan }}</td>
+                    <td class="px-6 py-3"><span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">{{ d.matkul }}</span></td>
+                  </tr>
+                  {% endfor %}
+                  <tr id="no-data-row" class="hidden"><td colspan="4" class="px-6 py-8 text-center text-slate-400 text-xs">Data tidak ditemukan.</td></tr>
+                </tbody>
+            </table>
+          </div>
+
+          {% elif page == 'matkul' %}
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <table class="w-full text-left text-sm" id="data-table-target">
+                <thead class="bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider">
+                  <tr><th class="px-6 py-3">Kode Modul</th><th class="px-6 py-3">Nama Mata Kuliah</th><th class="px-6 py-3">Bobot SKS</th><th class="px-6 py-3">Semester</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700">
+                  {% for mk in data_list %}
+                  <tr class="hover:bg-slate-50 transition table-row-item">
+                    <td class="px-6 py-3 font-mono font-bold text-slate-400">{{ mk.kode }}</td>
+                    <td class="px-6 py-3 font-semibold text-slate-900 data-search-field">{{ mk.nama }}</td>
+                    <td class="px-6 py-3 text-slate-600">{{ mk.sks }} SKS</td>
+                    <td class="px-6 py-3 text-slate-500">Semester {{ mk.semester }}</td>
+                  </tr>
+                  {% endfor %}
+                  <tr id="no-data-row" class="hidden"><td colspan="4" class="px-6 py-8 text-center text-slate-400 text-xs">Data tidak ditemukan.</td></tr>
+                </tbody>
+            </table>
+          </div>
+          {% endif %}
+
+        </main>
+    </div>
+
+<div id="modal-tambah" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-xl max-w-sm w-full p-6">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Tambah Data Mahasiswa</h3>
+        <form action="/mahasiswa/tambah" method="POST" class="space-y-4 text-left">
+            <div>
+                <label class="block text-[11px] font-bold uppercase text-slate-400">NIM Mahasiswa</label>
+                <input type="number" name="nim" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase text-slate-400">Nama Lengkap</label>
+                <input type="text" name="nama" pattern="[a-zA-Z\s\.]{3,50}" title="Nama harus berupa alfabet 3-50 karakter" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase text-slate-400">Program Studi</label>
+                <input type="text" name="prodi" value="Teknik Informatika" class="w-full mt-1 px-3 py-2 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl text-sm focus:outline-none transition">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeModalTambah()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs uppercase cursor-pointer">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-xs uppercase cursor-pointer">Simpan</button>
+            </div>
+            </form>
+        </div>
+    </div>
+
+<div id="modal-edit" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-xl max-w-sm w-full p-6">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Ubah Data Mahasiswa</h3>
+        <form action="/mahasiswa/edit" method="POST" class="space-y-4 text-left">
+            <input type="hidden" name="nim" id="edit-nim-hidden">
+            <div>
+                <label class="block text-[11px] font-bold uppercase text-slate-400">NIM (Kunci Utama)</label>
+                <input type="number" id="edit-nim-display" disabled class="w-full mt-1 px-3 py-2 bg-slate-100 border border-slate-200 text-slate-400 rounded-xl text-sm cursor-not-allowed">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase text-slate-400">Nama Lengkap</label>
+                <input type="text" name="nama" id="edit-nama" pattern="[a-zA-Z\s\.]{3,50}" title="Nama harus berupa alfabet 3-50 karakter" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase text-slate-400">Program Studi</label>
+                <input type="text" name="prodi" id="edit-prodi" required class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeModalEdit()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs uppercase cursor-pointer">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-xs uppercase cursor-pointer">Simpan Perubahan</button>
+            </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-hapus-revisi" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100">
+            <p class="text-sm font-semibold text-slate-700">apakah anda yakin ingin menghapus data ini?</p>
+            <div class="flex items-center justify-center gap-3 mt-6">
+                <button type="button" onclick="closeModalHapus()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl transition cursor-pointer">Batal</button>
+                <a id="link-eksekusi-hapus" href="#" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl text-center transition">Ya, Hapus</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. KONTROL BANNER TOAST (Selamat Datang)
+        document.addEventListener("DOMContentLoaded", function() {
+            const toast = document.getElementById("welcome-toast");
+            if (toast) {
+                setTimeout(() => {
+                    toast.classList.remove("opacity-100", "translate-y-0");
+                    toast.classList.add("opacity-0", "translate-y-4");
+                    setTimeout(() => toast.remove(), 500);
+                }, 2500);
+            }
+            if (document.getElementById("calendar-days-container")) {
+                renderCalendar();
+            }
+        });
+
+        // 2. KONTROL POP-UP MODAL BERITA KAMPUS (BUKA / TUTUP X)
+        function openAnnouncementModal() {
+            const modal = document.getElementById("announcement-modal");
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.children[0].classList.remove("scale-95");
+                modal.children[0].classList.add("scale-100");
+            }, 10);
+        }
+
+        function closeAnnouncementModal() {
+            const modal = document.getElementById("announcement-modal");
+            modal.children[0].classList.remove("scale-100");
+            modal.children[0].classList.add("scale-95");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 150);
+        }
+
+// 3. FITUR LIVE SEARCH INSTAN JAVASCRIPT DENGAN REALTIME METRICS (DEBOUNCE 3 DETIK)
+let searchTimeout;
+
+const searchInput = document.getElementById("live-search-input");
+if (searchInput) {
+    searchInput.addEventListener("input", function() {
+        const query = this.value.trim();
+        
+        // Tampilkan indikator loading ringan selagi user mengetik
+        const waktuEl = document.getElementById("realtime-waktu");
+        const kompleksitasEl = document.getElementById("realtime-kompleksitas");
+        
+        if (waktuEl) waktuEl.innerText = "Menghitung...";
+        
+        // Bersihkan timeout sebelumnya jika user masih mengetik
+        clearTimeout(searchTimeout);
+        
+        // Jalankan kalkulasi setelah user berhenti mengetik selama 3000ms (3 detik)
+        searchTimeout = setTimeout(() => {
+            const startTime = performance.now();
+            
+            // Eksekusi pemfilteran baris tabel data
+            let totalVisible = 0;
+            const rows = document.querySelectorAll(".table-row-item");
+            
+            rows.forEach(row => {
+                const targetText = row.querySelector(".data-search-field") ? row.querySelector(".data-search-field").innerText.toLowerCase() : "";
+                if (targetText.includes(query.toLowerCase())) {
+                    row.classList.remove("hidden");
+                    totalVisible++;
+                } else {
+                    row.classList.add("hidden");
+                }
+            });
+
+            const noDataRow = document.getElementById("no-data-row");
+            if (noDataRow) {
+                if (totalVisible === 0) {
+                    noDataRow.classList.remove("hidden");
+                } else {
+                    noDataRow.classList.add("hidden");
+                }
+            }
+
+            // Hitung durasi pencarian dalam satuan detik
+            const endTime = performance.now();
+            const durationInSeconds = ((endTime - startTime) / 1000).toFixed(5);
+            
+            // Perbarui komponen UI secara Real-Time
+            if (waktuEl) {
+                waktuEl.innerText = `${durationInSeconds} detik`;
+            }
+            
+            if (kompleksitasEl) {
+                // Aturan: Jika input berupa angka/NIM gunakan Binary Search info, sisanya Sequential
+                if (query !== "" && /^\d+$/.test(query)) {
+                    kompleksitasEl.innerText = "Binary Search Complexity: O(log n)";
+                } else {
+                    kompleksitasEl.innerText = "Sequential Search Complexity: O(n)";
+                }
+            }
+        }, 3000); // <-- Durasi jeda tunggu mengetik (3000 milidetik = 3 detik)
+    });
+}
+
+        // 4. LOGIC KALENDER INTERAKTIF & REVISI DINAMIS TINGGI GRAFIK BERDASARKAN TAHUN
+        let currentYear = 2026;
+        let currentMonth = 5; 
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        // Data Simulasi Dinamis Tinggi Grafik Kelulusan Saat Tahun Berubah
+        const grafikDataTahunan = {
+            2023: { h23: "90%", h24: "40%", h25: "50%", h26: "30%" },
+            2024: { h23: "35%", h24: "95%", h25: "40%", h26: "50%" },
+            2025: { h23: "40%", h24: "55%", h25: "95%", h26: "45%" },
+            2026: { h23: "40%", h24: "60%", h25: "80%", h26: "95%" },
+            2027: { h23: "25%", h24: "40%", h25: "60%", h26: "85%" }
+        };
+
+        function perbaruiGrafikKelulusan(tahun) {
+            const activeYearLabel = document.getElementById("active-graph-year");
+            if(activeYearLabel) activeYearLabel.innerText = tahun;
+
+            // Jika tahun di luar rentang simulasi grafik data, beri nilai default acak teratur
+            const data = grafikDataTahunan[tahun] || { h23: "50%", h24: "50%", h25: "50%", h26: "50%" };
+            
+            const b23 = document.getElementById("bar-2023");
+            const b24 = document.getElementById("bar-2024");
+            const b25 = document.getElementById("bar-2025");
+            const b26 = document.getElementById("bar-2026");
+
+            if(b23 && b24 && b25 && b26) {
+                b23.style.height = data.h23; document.getElementById("label-2023").innerText = data.h23;
+                b24.style.height = data.h24; document.getElementById("label-2024").innerText = data.h24;
+                b25.style.height = data.h25; document.getElementById("label-2025").innerText = data.h25;
+                b26.style.height = data.h26; document.getElementById("label-2026").innerText = data.h26;
+            }
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById("calendar-days-container");
+            const headerLabel = document.getElementById("calendar-month-year");
+            if (!container) return;
+
+            container.innerHTML = "";
+            headerLabel.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const lastDayDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const prevLastDayDate = new Date(currentYear, currentMonth, 0).getDate();
+
+            for (let i = firstDayIndex; i > 0; i--) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "p-2 text-slate-300 select-none text-[10px]";
+                dayDiv.innerText = prevLastDayDate - i + 1;
+                container.appendChild(dayDiv);
+            }
+
+            for (let day = 1; day <= lastDayDate; day++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "p-2 hover:bg-indigo-100/80 text-slate-700 rounded-lg cursor-pointer transition select-none font-medium text-[10px]";
+                dayDiv.innerText = day;
+
+                if (day === 10 && currentMonth === 5 && currentYear === 2026) {
+                    dayDiv.className = "p-2 bg-blue-600 text-white rounded-lg font-bold shadow-2xs select-none cursor-pointer text-[10px]";
+                }
+
+                dayDiv.onclick = function() {
+                    document.querySelectorAll("#calendar-days-container .bg-blue-600").forEach(el => {
+                        el.className = "p-2 hover:bg-indigo-100/80 text-slate-700 rounded-lg cursor-pointer transition select-none font-medium text-[10px]";
+                    });
+                    dayDiv.className = "p-2 bg-blue-600 text-white rounded-lg font-bold shadow-2xs select-none cursor-pointer text-[10px]";
+                    document.getElementById("selected-date-indicator").innerText = `Terpilih: ${day} ${monthNames[currentMonth]}`;
+                };
+
+                container.appendChild(dayDiv);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+            // REVISI: Picu fungsi pembaruan grafik kelulusan per tahun
+            perbaruiGrafikKelulusan(currentYear);
+        }
+
+        // 5. WINDOWS CONTROL INTERFACES MODAL CRUD DATA
+        function openModalTambah() { document.getElementById('modal-tambah').classList.remove('hidden'); }
+        function closeModalTambah() { document.getElementById('modal-tambah').classList.add('hidden'); }
+
+        function openModalEdit(nim, nama, prodi) {
+            document.getElementById('edit-nim-hidden').value = nim;
+            document.getElementById('edit-nim-display').value = nim;
+            document.getElementById('edit-nama').value = nama;
+            document.getElementById('edit-prodi').value = prodi;
+            document.getElementById('modal-edit').classList.remove('hidden');
+        }
+        function closeModalEdit() { document.getElementById('modal-edit').classList.add('hidden'); }
+
+        function triggerKonfirmasiHapus(nim) {
+            document.getElementById('link-eksekusi-hapus').href = "/mahasiswa/hapus/" + nim;
+            document.getElementById('modal-hapus-revisi').classList.remove('hidden');
+        }
+        function closeModalHapus() { document.getElementById('modal-hapus-revisi').classList.add('hidden'); }
+    </script>
+</body>
+</html>
