@@ -5,7 +5,7 @@ import os
 import re
 
 app = Flask(__name__)
-app.secret_key = 'kunci_rahasia_sim_2026'
+app.secret_key = os.environ.get('SECRET_KEY', 'kunci_rahasia_sim_2026')
 
 # Simulasi Database Akun di Memory
 users_db = {"admin": "admin123"}
